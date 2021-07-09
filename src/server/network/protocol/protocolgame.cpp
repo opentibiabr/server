@@ -3000,43 +3000,64 @@ void ProtocolGame::sendCyclopediaCharacterCombatStats()
 	alignas(16) int16_t absorbs[COMBAT_COUNT] = {};
 	for (int32_t slot = CONST_SLOT_FIRST; slot <= CONST_SLOT_LAST; ++slot)
 	{
-		if (!player->isItemAbilityEnabled(static_cast<slots_t>(slot)))
-		{
-			continue;
-		}
+		Item* item = player->getInventoryItem(static_cast<slots_t>(slot));
 
-		Item *item = player->getInventoryItem(static_cast<slots_t>(slot));
 		if (!item)
 		{
 			continue;
 		}
 
-		const ItemType &it = Item::items[item->getID()];
+		const ItemType& it = Item::items[item->getID()];
+
+		bool skipItemAbility = false;
+
 		if (!it.abilities)
 		{
-			continue;
+			skipItemAbility = true;
 		}
 
 		if (COMBAT_COUNT == 12)
 		{
-			absorbs[0] += it.abilities->absorbPercent[0];
-			absorbs[1] += it.abilities->absorbPercent[1];
-			absorbs[2] += it.abilities->absorbPercent[2];
-			absorbs[3] += it.abilities->absorbPercent[3];
-			absorbs[4] += it.abilities->absorbPercent[4];
-			absorbs[5] += it.abilities->absorbPercent[5];
-			absorbs[6] += it.abilities->absorbPercent[6];
-			absorbs[7] += it.abilities->absorbPercent[7];
-			absorbs[8] += it.abilities->absorbPercent[8];
-			absorbs[9] += it.abilities->absorbPercent[9];
-			absorbs[10] += it.abilities->absorbPercent[10];
-			absorbs[11] += it.abilities->absorbPercent[11];
+			if (!skipItemAbility)
+			{
+				absorbs[0] += it.abilities->absorbPercent[0];
+				absorbs[1] += it.abilities->absorbPercent[1];
+				absorbs[2] += it.abilities->absorbPercent[2];
+				absorbs[3] += it.abilities->absorbPercent[3];
+				absorbs[4] += it.abilities->absorbPercent[4];
+				absorbs[5] += it.abilities->absorbPercent[5];
+				absorbs[6] += it.abilities->absorbPercent[6];
+				absorbs[7] += it.abilities->absorbPercent[7];
+				absorbs[8] += it.abilities->absorbPercent[8];
+				absorbs[9] += it.abilities->absorbPercent[9];
+				absorbs[10] += it.abilities->absorbPercent[10];
+				absorbs[11] += it.abilities->absorbPercent[11];
+			}
+			else
+			{
+				absorbs[0] += player->getDeffFromImbuements(indexToCombatType(0), static_cast<slots_t>(slot));
+				absorbs[1] += player->getDeffFromImbuements(indexToCombatType(1), static_cast<slots_t>(slot));
+				absorbs[2] += player->getDeffFromImbuements(indexToCombatType(2), static_cast<slots_t>(slot));
+				absorbs[3] += player->getDeffFromImbuements(indexToCombatType(3), static_cast<slots_t>(slot));
+				absorbs[4] += player->getDeffFromImbuements(indexToCombatType(4), static_cast<slots_t>(slot));
+				absorbs[5] += player->getDeffFromImbuements(indexToCombatType(5), static_cast<slots_t>(slot));
+				absorbs[6] += player->getDeffFromImbuements(indexToCombatType(6), static_cast<slots_t>(slot));
+				absorbs[7] += player->getDeffFromImbuements(indexToCombatType(7), static_cast<slots_t>(slot));
+				absorbs[8] += player->getDeffFromImbuements(indexToCombatType(8), static_cast<slots_t>(slot));
+				absorbs[9] += player->getDeffFromImbuements(indexToCombatType(9), static_cast<slots_t>(slot));
+				absorbs[10] += player->getDeffFromImbuements(indexToCombatType(10), static_cast<slots_t>(slot));
+				absorbs[11] += player->getDeffFromImbuements(indexToCombatType(11), static_cast<slots_t>(slot));
+			}
 		}
 		else
 		{
 			for (uint16_t i = 0; i < COMBAT_COUNT; ++i)
 			{
-				absorbs[i] += it.abilities->absorbPercent[i];
+				if (!skipItemAbility)
+				{
+					absorbs[i] += it.abilities->absorbPercent[i];
+				}
+				absorbs[i] += player->getDeffFromImbuements(indexToCombatType(i), static_cast<slots_t>(slot));
 			}
 		}
 	}
